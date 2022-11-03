@@ -14,6 +14,19 @@ import (
 	"github.com/pborman/getopt/v2"
 )
 
+var toolname string = `
+ _   __      _               _                             
+| | / /     | |             | |                            
+| |/ / _   _| |__   ___  ___| |_ _ __ ___  _   _  ___ _ __ 
+|    \| | | | '_ \ / _ \/ __| __| '__/ _ \| | | |/ _ \ '__| v0.1
+| |\  \ |_| | |_) |  __/\__ \ |_| | | (_) | |_| |  __/ |   
+\_| \_/\__,_|_.__/ \___||___/\__|_|  \___/ \__, |\___|_|   
+                                            __/ |          
+                                           |___/ `
+var author = `			                        By Rolix`
+var split = `
+--------------------------------------------------------
+`
 var scanNode = false
 var target string
 var anonRce = false
@@ -63,7 +76,7 @@ func send_http_request(target string, port int, endpoint string) {
 	}
 }
 
-func parse_pod(target string) {
+func parse_pod(target string) *RunningPods {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get("https://" + target + ":10250/runningpods/")
 	if err != nil {
@@ -76,13 +89,13 @@ func parse_pod(target string) {
 		fmt.Print("Fail to read body")
 	}
 
-	input := &RunningPods{}
+	pods := &RunningPods{}
 
-	err = json.Unmarshal(body, &input)
+	err = json.Unmarshal(body, &pods)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	anon_rce(input)
+	return pods
 
 }
 
@@ -143,6 +156,7 @@ func check_ports(target string) {
 	}
 	target = "http://" + target
 	endpoint := "/"
+
 	for _, port := range knownPort {
 		if port == 10250 {
 			target := strings.Replace(target, "http", "https", 1)
@@ -155,13 +169,22 @@ func check_ports(target string) {
 
 	}
 
-	fmt.Println("Open Ports :")
-	for _, port := range openPort {
-		fmt.Println(strconv.Itoa(port))
+	if len(openPort) != 0 {
+		fmt.Println("Open Ports :")
+		for _, port := range openPort {
+			fmt.Println(strconv.Itoa(port))
+		}
+	} else {
+		fmt.Println("No open ports")
 	}
+
 }
 
 func main() {
+
+	fmt.Println("\x1b[1;36m" + toolname + "\x1b[0m")
+	fmt.Println("\x1b[1;32m" + author + "\x1b[0m")
+	fmt.Println(split)
 
 	getopt.FlagLong(&target, "target", 't', "target (IP or domain)").Mandatory()
 	getopt.FlagLong(&scanNode, "node-scan", 0, "Enable/disable node port scan").SetOptional()
@@ -172,6 +195,7 @@ func main() {
 	check_ports(target)
 
 	if anonRce {
-		parse_pod(target)
+		pods := parse_pod(target)
+		anon_rce(pods)
 	}
 }
