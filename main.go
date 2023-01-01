@@ -100,6 +100,7 @@ func parse_pod(target string) *RunningPods {
 }
 
 func anon_rce(runpod *RunningPods) {
+	fmt.Printf("Trying anon RCE using '%s' \n\n", rceCommand)
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	for i := 0; i < len(runpod.Items); i++ {
 		found := false
@@ -144,9 +145,12 @@ func anon_rce(runpod *RunningPods) {
 		}
 	}
 
+	fmt.Println(split)
+
 }
 
 func check_ports(target string) {
+	fmt.Print("Starting port scan...\n\n")
 	knownPort := []int{443, 2379, 6666, 4194, 6443, 8443, 8080, 10250, 10255, 10256, 9099, 6782, 6783, 6784, 44134}
 
 	if scanNode {
@@ -170,13 +174,13 @@ func check_ports(target string) {
 	}
 
 	if len(openPort) != 0 {
-		fmt.Println("Open Ports :")
 		for _, port := range openPort {
-			fmt.Println(strconv.Itoa(port))
+			fmt.Println("port " + strconv.Itoa(port) + " open")
 		}
 	} else {
-		fmt.Println("No open ports")
+		fmt.Println("\x1b[1;31mNo open ports found !\x1b[0m")
 	}
+	fmt.Println(split)
 
 }
 
@@ -186,13 +190,15 @@ func main() {
 	fmt.Println("\x1b[1;32m" + author + "\x1b[0m")
 	fmt.Println(split)
 
-	getopt.FlagLong(&target, "target", 't', "target (IP or domain)").Mandatory()
+	getopt.FlagLong(&target, "target", 't', "Target (IP or domain)").Mandatory()
 	getopt.FlagLong(&scanNode, "node-scan", 0, "Enable/disable node port scan").SetOptional()
-	getopt.FlagLong(&anonRce, "anon-rce", 0, "Directly try to RCE if kubelet API is open").SetOptional()
+	getopt.FlagLong(&anonRce, "anon-rce", 0, "Try to RCE if kubelet API is open").SetOptional()
 	getopt.Flag(&rceCommand, 'x', "Command to execute when using RCE")
 	getopt.Parse()
 
-	check_ports(target)
+	if !anonRce {
+		check_ports(target)
+	}
 
 	if anonRce {
 		pods := parse_pod(target)
