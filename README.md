@@ -18,11 +18,15 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+<div align="center">
+
+  [![Contributors][contributors-shield]][contributors-url]
+  [![Forks][forks-shield]][forks-url]
+  [![Stargazers][stars-shield]][stars-url]
+  [![Issues][issues-shield]][issues-url]
+  [![MIT License][license-shield]][license-url]
+
+</div>
 
 
 
@@ -30,19 +34,17 @@
 <br />
 <div align="center">
   <a href="https://github.com/Rolix44/Kubestroyer">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src=".github/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Kubestroyer</h3>
 
   <p align="center">
-    Kubestroyer aims to exploit Kubernetes clusters misconfigurations and be the swiss knife of your Kubernetes pentests
+    Kubestroyer aims to exploit Kubernetes clusters misconfigurations and be the swiss army knife of your Kubernetes pentests
     <br />
     <a href="https://github.com/Rolix44/Kubestroyer"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/Rolix44/Kubestroyer">View Demo</a>
-    ·
     <a href="https://github.com/Rolix44/Kubestroyer/issues">Report Bug</a>
     ·
     <a href="https://github.com/Rolix44/Kubestroyer/issues">Request Feature</a>
@@ -73,7 +75,6 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -84,7 +85,10 @@
 
 [![Product Name Screen Shot][product-screenshot]]()
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `Rolix44`, `Kubestroyer`, `Rolix_cy`, `linkedin_username`, `email_client`, `email`, `Kubestroyer`, `project_description`
+**Kubestroyer** is a Golang exploitation tool that aims to take advantage of Kubernetes clusters misconfigurations.
+
+The tool is scanning known Kubernetes ports that can be exposed as well as exploiting them.
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -102,31 +106,26 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
+* Go 1.19
   ```sh
-  npm install npm@latest -g
+  wget https://go.dev/dl/go1.19.4.linux-amd64.tar.gz
+  tar -C /usr/local -xzf go1.19.4.linux-amd64.tar.gz
   ```
 
 ### Installation
+Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build from source:
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/Rolix44/Kubestroyer.git
    ```
-3. Install NPM packages
+2. build the binary
    ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
+   go build -o Kubestroyer main.go 
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -135,10 +134,15 @@ This is an example of how to list things you need to use the software and how to
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+[![Product usage][usage-gif]]()
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+|  Parameter | Description | Mand/opt  | Example  | 
+|---|---|---|---|
+|  -t / --target | Target (IP or domain)  |  Mandatory | -t localhost  |
+| --node-scan  | Enable node port scanning (port 30000 to 32767)  |  Optionnal | -t localhost --node-scan  |
+| --anon-rce  | RCE using Kubelet API anonymous auth  | Optionnal  | -t localhost --anon-rce  |
+|  -x  |  Command to execute when using RCE (display service account token by default) | Optionnal  | -t localhost --anon-rce -x "ls -al"  |
 
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -214,4 +218,6 @@ Project Link: [https://github.com/Rolix44/Kubestroyer](https://github.com/Rolix4
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [Golang]: https://img.shields.io/badge/Golang-0769AD?style=for-the-badge&logo=Go&logoColor=white
 [Golang-url]: https://go.dev/
-[product-screenshot]: ./images/project-name.png
+[product-screenshot]: .github/project-name.png
+[release]: https://github.com/Rolix44/Kubestroyer/releases/new
+[usage-gif]: .github/kubestroyer-usage.gif
