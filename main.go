@@ -175,7 +175,7 @@ func check_ports(target string) {
 
 	if len(openPort) != 0 {
 		for _, port := range openPort {
-			fmt.Println("port " + strconv.Itoa(port) + " open")
+			fmt.Println("\x1b[1;31m[!]\x1b[0m port " + strconv.Itoa(port) + " open")
 		}
 	} else {
 		fmt.Println("\x1b[1;31mNo open ports found !\x1b[0m")
@@ -187,7 +187,7 @@ func check_ports(target string) {
 func main() {
 
 	fmt.Println("\x1b[1;36m" + toolname + "\x1b[0m")
-	fmt.Println("\x1b[1;32m" + author + "\x1b[0m")
+	fmt.Println(author)
 	fmt.Println(split)
 
 	getopt.FlagLong(&target, "target", 't', "Target (IP or domain)").Mandatory()
