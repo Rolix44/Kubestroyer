@@ -89,6 +89,14 @@ func parse_pod(target string) *RunningPods {
 		fmt.Print("Fail to read body")
 	}
 
+  if string(body) == "Unauthorized" {
+    log.Fatalln(string(body))
+  }
+
+  if strings.HasPrefix(string(body), "Forbidden") {
+    log.Fatalln(string(body))
+  }
+
 	pods := &RunningPods{}
 
 	err = json.Unmarshal(body, &pods)
