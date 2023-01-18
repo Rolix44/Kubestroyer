@@ -125,7 +125,7 @@ Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build 
    ```
 2. build the binary
    ```sh
-   go build -o Kubestroyer main.go 
+   go build -o Kubestroyer cmd/kubestroyer/main.go 
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
