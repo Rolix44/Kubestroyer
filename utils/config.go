@@ -28,15 +28,17 @@ type RunningPods struct {
 }
 
 var Target string
+var Targets []string
 var AnonRce = false
 var RceCommand = "cat /var/run/secrets/kubernetes.io/serviceaccount/token"
 var ScanNode = false
 
 func Config() {
 
-	getopt.FlagLong(&Target, "target", 't', "Target (IP or domain)").Mandatory()
+	getopt.FlagLong(&Target, "target", 't', "Target (IP, domain or file)").SetGroup("target")
 	getopt.FlagLong(&ScanNode, "node-scan", 0, "Enable/disable node port scan").SetOptional()
 	getopt.FlagLong(&AnonRce, "anon-rce", 0, "Try to RCE if kubelet API is open").SetOptional()
-	getopt.Flag(&RceCommand, 'x', "Command to execute when using RCE")
+	getopt.Flag(&RceCommand, 'x', "Command to execute when using RCE").SetOptional()
+
 	getopt.Parse()
 }
