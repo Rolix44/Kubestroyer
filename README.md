@@ -106,7 +106,7 @@ The tool is scanning known Kubernetes ports that can be exposed as well as explo
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To get a local copy up and running follow these simple example steps.
+To get a local copy up and running, follow these simple example steps.
 
 ### Prerequisites
 
@@ -138,7 +138,7 @@ Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build 
 
 |  Parameter | Description | Mand/opt  | Example  | 
 |---|---|---|---|
-|  -t / --target | Target (IP or domain)  |  Mandatory | -t localhost  |
+|  -t / --target | Target (IP, domain or file)  |  Mandatory | -t localhost,127.0.0.1 /  -t ./domain.txt  |
 | --node-scan  | Enable node port scanning (port 30000 to 32767)  |  Optionnal | -t localhost --node-scan  |
 | --anon-rce  | RCE using Kubelet API anonymous auth  | Optionnal  | -t localhost --anon-rce  |
 |  -x  |  Command to execute when using RCE (display service account token by default) | Optionnal  | -t localhost --anon-rce -x "ls -al"  |
@@ -152,9 +152,9 @@ Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build 
 ## Roadmap
 
 - [x] Split main into different packages
-- [ ] Target selection
-    - [ ] List of multiple targets
-    - [ ] input file as target parameter
+- [x] Target selection
+    - [x] List of multiple targets
+    - [x] input file as target parameter
 - [ ] Description for each detected open port
 - [ ] Choose the pod for anon RCE 
 

