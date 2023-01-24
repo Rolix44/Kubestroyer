@@ -34,7 +34,6 @@ func send_http_request(target string, port int, endpoint string) {
 func check_ports(target string) {
 	fmt.Printf("Starting port scan for '%s'... \n\n", target)
 	openPort = nil
-	knownPort := []int{443, 2379, 6666, 4194, 6443, 8443, 8080, 10250, 10255, 10256, 9099, 6782, 6783, 6784, 44134}
 
 	if utils.ScanNode {
 		for port := 30000; port <= 32767; port++ {
@@ -44,7 +43,7 @@ func check_ports(target string) {
 	target = "http://" + target
 	endpoint := "/"
 
-	for _, port := range knownPort {
+	for port := range utils.KnownPorts {
 		if port == 10250 {
 			target := strings.Replace(target, "http", "https", 1)
 			endpoint = "/metrics"
@@ -58,7 +57,7 @@ func check_ports(target string) {
 
 	if len(openPort) != 0 {
 		for _, port := range openPort {
-			fmt.Println("\x1b[1;32m[+]\x1b[0m port " + strconv.Itoa(port) + " open")
+			fmt.Println("\x1b[1;32m[+]\x1b[0m port " + strconv.Itoa(port) + " open (" + utils.KnownPorts[port] + ")")
 		}
 	} else {
 		fmt.Println("\x1b[1;31mNo open ports found !\x1b[0m")
