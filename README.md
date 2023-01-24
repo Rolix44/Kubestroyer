@@ -155,7 +155,7 @@ Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build 
 - [x] Target selection
     - [x] List of multiple targets
     - [x] input file as target parameter
-- [ ] Description for each detected open port
+- [x] Description for each detected open port
 - [ ] Choose the pod for anon RCE 
 
 See the [open issues](https://github.com/Rolix44/Kubestroyer/issues) for a full list of proposed features (and known issues).
