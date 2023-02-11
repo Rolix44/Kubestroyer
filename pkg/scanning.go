@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Rolix44/Kubestroyer/utils"
 )
@@ -24,7 +25,10 @@ func nodeport_scan(target string, port int) {
 
 func send_http_request(target string, port int, endpoint string) {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	resp, err := http.Get(target + ":" + strconv.Itoa(port) + endpoint)
+	client := http.Client{
+		Timeout: 3 * time.Second,
+	}
+	resp, err := client.Get(target + ":" + strconv.Itoa(port) + endpoint)
 	if err == nil {
 		openPort = append(openPort, port)
 		defer resp.Body.Close()
@@ -44,12 +48,14 @@ func check_ports(target string) {
 	endpoint := "/"
 
 	for port := range utils.KnownPorts {
-		if port == 10250 {
+		if port == 10250 || port == 443 {
 			target := strings.Replace(target, "http", "https", 1)
-			endpoint = "/metrics"
+			if port == 10250 {
+				endpoint = "/metrics"
+			}
 			send_http_request(target, port, endpoint)
+			endpoint = "/"
 		} else {
-
 			send_http_request(target, port, endpoint)
 		}
 

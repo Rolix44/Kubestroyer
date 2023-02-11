@@ -1,6 +1,8 @@
 package utils
 
-import "github.com/pborman/getopt/v2"
+import (
+	"github.com/pborman/getopt/v2"
+)
 
 type RunningPods struct {
 	Kind       string `json:"kind"`
@@ -35,10 +37,10 @@ var ScanNode = false
 
 func Config() {
 
-	getopt.FlagLong(&Target, "target", 't', "Target (IP, domain or file)").SetGroup("target")
+	getopt.FlagLong(&Target, "target", 't', "Target (IP, domain or file)").Mandatory()
 	getopt.FlagLong(&ScanNode, "node-scan", 0, "Enable/disable node port scan").SetOptional()
 	getopt.FlagLong(&AnonRce, "anon-rce", 0, "Try to RCE if kubelet API is open").SetOptional()
-	getopt.Flag(&RceCommand, 'x', "Command to execute when using RCE").SetOptional()
+	getopt.Flag(&RceCommand, 'x', "Command to execute when using RCE")
 
 	getopt.Parse()
 }
