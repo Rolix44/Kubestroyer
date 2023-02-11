@@ -117,15 +117,25 @@ To get a local copy up and running, follow these simple example steps.
   ```
 
 ### Installation
-Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build from source:
+Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) 
+
+**or**
+
+Using go install command :
+```sh
+$ go install github.com/Rolix44/Kubestroyer@latest
+```
+**or**
+
+build from source:
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/Rolix44/Kubestroyer.git
+   $ git clone https://github.com/Rolix44/Kubestroyer.git
    ```
 2. build the binary
    ```sh
-   go build -o Kubestroyer cmd/kubestroyer/main.go 
+   $ go build -o Kubestroyer cmd/kubestroyer/main.go 
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
