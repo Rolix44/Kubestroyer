@@ -106,7 +106,7 @@ The tool is scanning known Kubernetes ports that can be exposed as well as explo
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To get a local copy up and running follow these simple example steps.
+To get a local copy up and running, follow these simple example steps.
 
 ### Prerequisites
 
@@ -117,15 +117,25 @@ To get a local copy up and running follow these simple example steps.
   ```
 
 ### Installation
-Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build from source:
+Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) 
+
+**or**
+
+Using go install command :
+```sh
+$ go install github.com/Rolix44/Kubestroyer@latest
+```
+**or**
+
+build from source:
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/Rolix44/Kubestroyer.git
+   $ git clone https://github.com/Rolix44/Kubestroyer.git
    ```
 2. build the binary
    ```sh
-   go build -o Kubestroyer main.go 
+   $ go build -o Kubestroyer cmd/kubestroyer/main.go 
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -138,7 +148,7 @@ Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build 
 
 |  Parameter | Description | Mand/opt  | Example  | 
 |---|---|---|---|
-|  -t / --target | Target (IP or domain)  |  Mandatory | -t localhost  |
+|  -t / --target | Target (IP, domain or file)  |  Mandatory | -t localhost,127.0.0.1 /  -t ./domain.txt  |
 | --node-scan  | Enable node port scanning (port 30000 to 32767)  |  Optionnal | -t localhost --node-scan  |
 | --anon-rce  | RCE using Kubelet API anonymous auth  | Optionnal  | -t localhost --anon-rce  |
 |  -x  |  Command to execute when using RCE (display service account token by default) | Optionnal  | -t localhost --anon-rce -x "ls -al"  |
@@ -151,11 +161,11 @@ Use [prebuilt binary](https://github.com/Rolix44/Kubestroyer/releases) or build 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Split main into different packages
-- [ ] Target selection
-    - [ ] List of multiple targets
-    - [ ] input file as target parameter
-- [ ] Description for each detected open port
+- [x] Split main into different packages
+- [x] Target selection
+    - [x] List of multiple targets
+    - [x] input file as target parameter
+- [x] Description for each detected open port
 - [ ] Choose the pod for anon RCE 
 
 See the [open issues](https://github.com/Rolix44/Kubestroyer/issues) for a full list of proposed features (and known issues).
