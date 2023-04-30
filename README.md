@@ -157,16 +157,30 @@ build from source:
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
+<!-- CURRENT FEATURES -->
+## Currently supported features
+
+- Target
+  - List of multiple targets
+  - Input file as target
+
+- Scanning
+  - Known ports scan
+  - Node port scan (30000 to 32767)
+  - Port description
+
+- Vulnerabilities
+  - Annon RCE on Kubelet
+    - Choose command to execute
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Split main into different packages
-- [x] Target selection
-    - [x] List of multiple targets
-    - [x] input file as target parameter
-- [x] Description for each detected open port
 - [ ] Choose the pod for anon RCE 
+- [ ] Etcd exploit
+- [ ] Kubelet read-only API parsing for information disclosure
 
 See the [open issues](https://github.com/Rolix44/Kubestroyer/issues) for a full list of proposed features (and known issues).
 
