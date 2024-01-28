@@ -14,16 +14,18 @@ import (
 
 var openPort []int
 
-func nodeport_scan(target string, port int) {
+func nodeportScan(target string, port int) {
+	d := net.Dialer{Timeout: 5}
 	servAddr := target + ":" + strconv.Itoa(port)
-	_, err := net.Dial("tcp", servAddr)
-	if !strings.Contains(err.Error(), "connection refused") {
-		openPort = append(openPort, port)
+	_, err := d.Dial("tcp", servAddr)
+	if err != nil {
+		return
 	}
+	openPort = append(openPort, port)
 
 }
 
-func send_http_request(target string, port int, endpoint string) {
+func sendHttpRequest(target string, port int, endpoint string) {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	client := http.Client{
 		Timeout: 3 * time.Second,
@@ -35,13 +37,13 @@ func send_http_request(target string, port int, endpoint string) {
 	}
 }
 
-func check_ports(target string) {
+func checkPorts(target string) {
 	fmt.Printf("Starting port scan for '%s'... \n\n", target)
 	openPort = nil
 
 	if utils.ScanNode {
 		for port := 30000; port <= 32767; port++ {
-			nodeport_scan(target, port)
+			nodeportScan(target, port)
 		}
 	}
 	target = "http://" + target
@@ -53,10 +55,10 @@ func check_ports(target string) {
 			if port == 10250 {
 				endpoint = "/metrics"
 			}
-			send_http_request(target, port, endpoint)
+			sendHttpRequest(target, port, endpoint)
 			endpoint = "/"
 		} else {
-			send_http_request(target, port, endpoint)
+			sendHttpRequest(target, port, endpoint)
 		}
 
 	}
