@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/AlecAivazis/survey/v2"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"io"
 	"log"
@@ -104,20 +105,56 @@ func anonRce(runpod *utils.RunningPods, target string) {
 
 }
 
-func listEtcdObjects(target string) {
+func readEtcdObjects(target string) {
+	var objects []string
+	var selectedObjects []string
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{target + ":2379"},
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
-		fmt.Println(err)
+		return
 	}
-	defer cli.Close()
+	defer func(cli *clientv3.Client) {
+		err := cli.Close()
+		if err != nil {
+			return
+		}
+	}(cli)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	resp, err := cli.Get(ctx, "/", clientv3.WithKeysOnly(), clientv3.WithPrefix())
 	cancel()
 	if err != nil {
-		fmt.Println(err)
+		return
 	}
-	fmt.Println(string(resp.Kvs[0].Key))
+
+	if len(resp.Kvs) == 0 {
+		fmt.Println("No objects found in Etcd")
+	} else {
+
+		for _, data := range resp.Kvs {
+			objects = append(objects, string(data.Key))
+		}
+		prompt := &survey.MultiSelect{
+			Message: "Select objects to print:",
+			Options: objects,
+		}
+		err = survey.AskOne(prompt, &selectedObjects)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	for _, selected := range selectedObjects {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		resp, err := cli.Get(ctx, selected)
+		cancel()
+		if err != nil {
+			fmt.Printf("Error fetching value for %s: %v\n", selected, err)
+			continue
+		}
+
+		fmt.Printf("Value for %s:\n %s\n", selected, resp.Kvs[0].Value)
+	}
+
+	fmt.Println(utils.Split)
 }

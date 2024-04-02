@@ -146,12 +146,13 @@ build from source:
 ## Usage
 [![Product usage][usage-gif]]()
 
-|  Parameter | Description | Mand/opt  | Example  | 
-|---|---|---|---|
-|  -t / --target | Target (IP, domain or file)  |  Mandatory | -t localhost,127.0.0.1 /  -t ./domain.txt  |
-| --node-scan  | Enable node port scanning (port 30000 to 32767)  |  Optionnal | -t localhost --node-scan  |
-| --anon-rce  | RCE using Kubelet API anonymous auth  | Optionnal  | -t localhost --anon-rce  |
-|  -x  |  Command to execute when using RCE (display service account token by default) | Optionnal  | -t localhost --anon-rce -x "ls -al"  |
+| Parameter    | Description                                                                 | Mand/opt  | Example                                  | 
+|--------------|-----------------------------------------------------------------------------|---|------------------------------------------|
+| -t / --target | Target (IP, domain or file)                                                 |  Mandatory | -t localhost,127.0.0.1 /  -t ./domain.txt |
+| --node-scan  | Enable node port scanning (port 30000 to 32767)                             |  Optionnal | -t localhost --node-scan                 |
+| --anon-rce   | RCE using Kubelet API anonymous auth                                        | Optionnal  | -t localhost --anon-rce                  |
+| -x           | Command to execute when using RCE (display service account token by default) | Optionnal  | -t localhost --anon-rce -x "ls -al"      |
+| --etcd       | Read wanted objects if etcd anonymous access is enabled                     | Optionnal  | -t localhost --etcd                      |
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -172,6 +173,7 @@ build from source:
 - Vulnerabilities
   - Annon RCE on Kubelet
     - Choose command to execute
+  - Etcd anonymous read
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -179,7 +181,7 @@ build from source:
 ## Roadmap
 
 - [ ] Choose the pod for anon RCE 
-- [ ] Etcd exploit
+- [x] Etcd exploit
 - [ ] Kubelet read-only API parsing for information disclosure
 
 See the [open issues](https://github.com/Rolix44/Kubestroyer/issues) for a full list of proposed features (and known issues).

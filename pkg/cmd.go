@@ -30,16 +30,18 @@ func Execute() {
 		}
 	}
 
-	listEtcdObjects(utils.Target)
+	for _, target := range utils.Targets {
+		if !utils.AnonRce && !utils.ScanEtcd {
+			checkPorts(target)
+		}
 
-	//for _, target := range utils.Targets {
-	//	if !utils.AnonRce {
-	//		checkPorts(target)
-	//	}
-	//
-	//	if utils.AnonRce {
-	//		pods := parsePod(target)
-	//		anonRce(pods, target)
-	//	}
-	//}
+		if utils.AnonRce {
+			pods := parsePod(target)
+			anonRce(pods, target)
+		}
+
+		if utils.ScanEtcd {
+			readEtcdObjects(target)
+		}
+	}
 }
