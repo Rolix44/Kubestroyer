@@ -173,6 +173,7 @@ build from source:
 - Vulnerabilities
   - Annon RCE on Kubelet
     - Choose command to execute
+    - Choose container to execute command in
   - Etcd anonymous read
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -180,7 +181,7 @@ build from source:
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Choose the pod for anon RCE 
+- [x] Choose the pod for anon RCE 
 - [x] Etcd exploit
 - [ ] Kubelet read-only API parsing for information disclosure
 

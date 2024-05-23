@@ -36,8 +36,7 @@ func Execute() {
 		}
 
 		if utils.AnonRce {
-			pods := parsePod(target)
-			anonRce(pods, target)
+			anonRce(target)
 		}
 
 		if utils.ScanEtcd {
