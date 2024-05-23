@@ -31,13 +31,16 @@ func Execute() {
 	}
 
 	for _, target := range utils.Targets {
-		if !utils.AnonRce {
-			check_ports(target)
+		if !utils.AnonRce && !utils.ScanEtcd {
+			checkPorts(target)
 		}
 
 		if utils.AnonRce {
-			pods := parse_pod(target)
-			anon_rce(pods, target)
+			anonRce(target)
+		}
+
+		if utils.ScanEtcd {
+			readEtcdObjects(target)
 		}
 	}
 }
