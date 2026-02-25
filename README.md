@@ -110,10 +110,10 @@ To get a local copy up and running, follow these simple example steps.
 
 ### Prerequisites
 
-* Go 1.19
+* Go 1.22+
   ```sh
-  wget https://go.dev/dl/go1.19.4.linux-amd64.tar.gz
-  tar -C /usr/local -xzf go1.19.4.linux-amd64.tar.gz
+  wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+  tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
   ```
 
 ### Installation
@@ -135,7 +135,7 @@ build from source:
    ```
 2. build the binary
    ```sh
-   $ go build -o Kubestroyer cmd/kubestroyer/main.go 
+   $ go build -o Kubestroyer ./cmd/kubestroyer/
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -146,13 +146,51 @@ build from source:
 ## Usage
 [![Product usage][usage-gif]]()
 
-| Parameter    | Description                                                                 | Mand/opt  | Example                                  | 
-|--------------|-----------------------------------------------------------------------------|---|------------------------------------------|
-| -t / --target | Target (IP, domain or file)                                                 |  Mandatory | -t localhost,127.0.0.1 /  -t ./domain.txt |
-| --node-scan  | Enable node port scanning (port 30000 to 32767)                             |  Optionnal | -t localhost --node-scan                 |
-| --anon-rce   | RCE using Kubelet API anonymous auth                                        | Optionnal  | -t localhost --anon-rce                  |
-| -x           | Command to execute when using RCE (display service account token by default) | Optionnal  | -t localhost --anon-rce -x "ls -al"      |
-| --etcd       | Read wanted objects if etcd anonymous access is enabled                     | Optionnal  | -t localhost --etcd                      |
+Kubestroyer uses subcommands. All subcommands require `-t` / `--target`.
+
+### Global flags (all subcommands)
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-t` / `--target` | Target IP, domain, comma-separated list, or file path | — (required) |
+| `--workers` | Number of concurrent scan workers | 100 |
+| `--tcp-timeout` | TCP connection timeout | 5s |
+| `--http-timeout` | HTTP request timeout | 3s |
+
+### Subcommands
+
+| Subcommand | Description | Subcommand flags |
+|------------|-------------|-----------------|
+| `all` | Run every check and exploit in sequence | `--node-ports`, `-x` / `--command` |
+| `scan` | Scan known Kubernetes ports | `--node-ports` |
+| `kubelet-ro` | Check Kubelet read-only port (10255) for unauthenticated exposure | — |
+| `rce` | Exploit Kubelet anonymous RCE (port 10250) | `-x` / `--command` |
+| `etcd` | Read etcd objects anonymously (port 2379) | — |
+
+### Examples
+
+```sh
+# Run all checks and exploits against a single target
+$ ./Kubestroyer all -t 192.168.1.1
+
+# Run all checks with NodePort scanning and a custom RCE command
+$ ./Kubestroyer all -t targets.txt --node-ports -x "id"
+
+# Scan known Kubernetes ports
+$ ./Kubestroyer scan -t 192.168.1.1
+
+# Scan including NodePort range (30000–32767)
+$ ./Kubestroyer scan -t 192.168.1.1 --node-ports
+
+# Check Kubelet read-only port for unauthenticated endpoint exposure
+$ ./Kubestroyer kubelet-ro -t 192.168.1.1
+
+# Exploit Kubelet anonymous RCE with a custom command
+$ ./Kubestroyer rce -t 192.168.1.1 -x "cat /etc/passwd"
+
+# Read etcd objects anonymously
+$ ./Kubestroyer etcd -t 192.168.1.1
+```
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -162,28 +200,40 @@ build from source:
 ## Currently supported features
 
 - Target
-  - List of multiple targets
-  - Input file as target
+  - Single IP or domain
+  - Comma-separated list of targets
+  - Input file as target (one target per line)
 
-- Scanning
-  - Known ports scan
-  - Node port scan (30000 to 32767)
-  - Port description
+- Scanning (`scan`)
+  - Known Kubernetes port scan with service descriptions
+  - NodePort range scan (30000–32767) via `--node-ports`
+  - Concurrent scanning with configurable worker count
+
+- Kubelet read-only port check (`kubelet-ro`)
+  - Detects unauthenticated exposure of port 10255
+  - Probes `/healthz`, `/metrics`, `/pods`, `/spec`, `/containerLogs`
+  - Fetches real container logs when `/pods` is accessible
 
 - Vulnerabilities
-  - Annon RCE on Kubelet
-    - Choose command to execute
-    - Choose container to execute command in
-  - Etcd anonymous read
+  - Kubelet anonymous RCE (`rce`)
+    - Interactive container selection
+    - Custom command execution
+  - Etcd anonymous read (`etcd`)
+    - Interactive key selection
+    - Value retrieval for selected keys
+
+- Run everything at once (`all`)
+  - Executes scan → kubelet-ro → rce → etcd in sequence
+  - Per-step errors are non-fatal; remaining steps always run
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Choose the pod for anon RCE 
+- [x] Choose the pod for anon RCE
 - [x] Etcd exploit
-- [ ] Kubelet read-only API parsing for information disclosure
+- [x] Kubelet read-only API parsing for information disclosure
 
 See the [open issues](https://github.com/Rolix44/Kubestroyer/issues) for a full list of proposed features (and known issues).
 

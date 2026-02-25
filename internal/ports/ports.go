@@ -1,10 +1,8 @@
-package utils
+package ports
 
-func init() {
-	addKnownServicePort()
-}
+import "maps"
 
-var KnownPorts = map[int]string{
+var knownPorts = map[int]string{
 	443:   "Kubernetes API port",
 	2379:  "Etcd",
 	6666:  "Etcd",
@@ -22,8 +20,16 @@ var KnownPorts = map[int]string{
 	44134: "Tiller service listening",
 }
 
-func addKnownServicePort() {
-	for port := 30000; port <= 32767; port++ {
-		KnownPorts[port] = "Possible NodePort service"
+// KnownPorts returns a clone of the base Kubernetes port map.
+func KnownPorts() map[int]string {
+	return maps.Clone(knownPorts)
+}
+
+// WithNodePorts returns the base port map extended with NodePort range 30000–32767.
+func WithNodePorts() map[int]string {
+	m := KnownPorts()
+	for p := 30000; p <= 32767; p++ {
+		m[p] = "Possible NodePort service"
 	}
+	return m
 }

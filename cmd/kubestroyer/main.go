@@ -1,19 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
-	"github.com/Rolix44/Kubestroyer/pkg"
-	"github.com/Rolix44/Kubestroyer/utils"
+	"github.com/Rolix44/Kubestroyer/internal/cli"
 )
 
 func main() {
-
-	fmt.Println("\x1b[1;36m" + utils.Toolname + "\x1b[0m")
-	fmt.Println(utils.Author)
-	fmt.Println(utils.Split)
-
-	utils.Config()
-	pkg.Execute()
-
+	if err := cli.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
